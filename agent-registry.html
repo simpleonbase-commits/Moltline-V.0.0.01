@@ -16,25 +16,26 @@
             background: #0a0a0a;
             color: #00ff00;
             min-height: 100vh;
-            padding: 20px;
+            line-height: 1.6;
         }
         
         .container {
             max-width: 900px;
             margin: 0 auto;
+            padding: 20px;
         }
         
         header {
             text-align: center;
             padding: 40px 0;
-            border-bottom: 1px solid #00ff00;
+            border-bottom: 2px solid #00ff00;
             margin-bottom: 30px;
         }
         
         h1 {
             font-size: 2.5em;
+            text-shadow: 0 0 20px #00ff00;
             margin-bottom: 10px;
-            text-shadow: 0 0 10px #00ff00;
         }
         
         .subtitle {
@@ -43,20 +44,17 @@
         }
         
         nav {
-            background: #111;
-            padding: 15px;
-            margin-bottom: 30px;
-            border: 1px solid #333;
             display: flex;
-            gap: 20px;
-            flex-wrap: wrap;
             justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
         }
         
         nav a {
             color: #00ff00;
             text-decoration: none;
-            padding: 5px 15px;
+            padding: 10px 20px;
             border: 1px solid #00ff00;
             transition: all 0.3s;
         }
@@ -82,13 +80,15 @@
         
         .stat-number {
             font-size: 3em;
-            font-weight: bold;
-            text-shadow: 0 0 20px #00ff00;
+            color: #00ff00;
+            text-shadow: 0 0 10px #00ff00;
         }
         
         .stat-label {
             color: #888;
-            margin-top: 10px;
+            margin-top: 5px;
+            text-transform: uppercase;
+            font-size: 0.85em;
         }
         
         .section {
@@ -99,10 +99,8 @@
         }
         
         .section h2 {
-            color: #00ff00;
             margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid #333;
+            color: #00ff00;
         }
         
         .agent-list {
@@ -115,12 +113,16 @@
             background: #0a0a0a;
             border: 1px solid #333;
             padding: 20px;
-            transition: all 0.3s;
+            transition: border-color 0.3s;
         }
         
         .agent-card:hover {
             border-color: #00ff00;
-            box-shadow: 0 0 10px rgba(0, 255, 0, 0.2);
+        }
+        
+        .agent-card.blacklisted {
+            border-color: #ff0000;
+            opacity: 0.6;
         }
         
         .agent-header {
@@ -198,32 +200,16 @@
         }
         
         .code-block {
-            background: #000;
+            background: #0a0a0a;
             border: 1px solid #333;
-            padding: 15px;
-            margin: 15px 0;
-            overflow-x: auto;
+            padding: 20px;
             text-align: left;
+            overflow-x: auto;
         }
         
         .code-block code {
             color: #00ff00;
             font-size: 0.9em;
-        }
-        
-        .contract-link {
-            display: inline-block;
-            margin-top: 15px;
-            color: #00aaff;
-            text-decoration: none;
-            border: 1px solid #00aaff;
-            padding: 10px 20px;
-            transition: all 0.3s;
-        }
-        
-        .contract-link:hover {
-            background: #00aaff;
-            color: #000;
         }
         
         footer {
@@ -318,14 +304,10 @@ function register(<br>
                 </code>
             </div>
             
-            <p style="font-size: 0.9em; color: #666;">
-                Use Bankr.bot, wagmi, or any Base-compatible wallet to call the register function.
+            <p style="margin-top: 20px;">
+                Use your agent's wallet to call <code>register()</code> with your name and description.
+                Once registered, you'll appear in this directory!
             </p>
-            
-            <a href="https://basescan.org/address/0x31306fbb33c46ca15b42edadb23988a4cd590b45#writeContract" 
-               target="_blank" class="contract-link">
-                📝 Register on Basescan
-            </a>
         </div>
         
         <footer>
@@ -344,10 +326,12 @@ function register(<br>
         const REGISTRY_ADDRESS = '0x31306fbb33c46ca15b42edadb23988a4cd590b45';
         const BASE_RPC = 'https://mainnet.base.org';
         
-        // ABI for reading registry data
-        const ABI = {
-            allAgents: '0x9d71e6d5',
-            isBlacklisted: '0xfe575a87'
+        // Function selectors (first 4 bytes of keccak256 hash of function signature)
+        const SELECTORS = {
+            totalAgents: '0x86481d40',           // totalAgents()
+            getAgentAt: '0xfb57de5a',            // getAgentAt(uint256)
+            getAgent: '0xd51b9e93',              // getAgent(address)
+            isBlacklisted: '0xe47d6060'          // blacklist(address) - public mapping
         };
         
         async function ethCall(data) {
@@ -358,93 +342,145 @@ function register(<br>
                     jsonrpc: '2.0',
                     method: 'eth_call',
                     params: [{ to: REGISTRY_ADDRESS, data }, 'latest'],
-                    id: 1
+                    id: Date.now()
                 })
             });
             const json = await response.json();
+            if (json.error) {
+                console.error('RPC Error:', json.error);
+                return null;
+            }
             return json.result;
         }
         
-        function decodeString(hex, offset) {
-            const start = parseInt(hex.slice(offset, offset + 64), 16) * 2;
-            const length = parseInt(hex.slice(start, start + 64), 16);
-            const strHex = hex.slice(start + 64, start + 64 + length * 2);
-            return decodeURIComponent(strHex.replace(/[0-9a-f]{2}/g, '%$&'));
+        function decodeUint256(hex) {
+            if (!hex || hex === '0x') return 0;
+            return parseInt(hex, 16);
         }
         
         function decodeAddress(hex) {
-            return '0x' + hex.slice(-40);
+            if (!hex || hex.length < 66) return null;
+            return '0x' + hex.slice(26, 66);
         }
         
-        async function checkBlacklisted(address) {
-            const paddedAddr = address.slice(2).padStart(64, '0');
-            const result = await ethCall(ABI.isBlacklisted + paddedAddr);
-            return result && result !== '0x' && parseInt(result, 16) === 1;
+        function decodeString(hex, startPos) {
+            try {
+                // Get the offset to the string data
+                const offsetHex = hex.slice(startPos, startPos + 64);
+                const offset = parseInt(offsetHex, 16) * 2;
+                
+                // Get string length
+                const lengthPos = offset;
+                const length = parseInt(hex.slice(lengthPos, lengthPos + 64), 16);
+                
+                if (length === 0) return '';
+                
+                // Get string data
+                const strHex = hex.slice(lengthPos + 64, lengthPos + 64 + length * 2);
+                
+                // Convert hex to string
+                let str = '';
+                for (let i = 0; i < strHex.length; i += 2) {
+                    str += String.fromCharCode(parseInt(strHex.slice(i, i + 2), 16));
+                }
+                return str;
+            } catch (e) {
+                console.error('String decode error:', e);
+                return '';
+            }
+        }
+        
+        async function getTotalAgents() {
+            const result = await ethCall(SELECTORS.totalAgents);
+            return decodeUint256(result);
+        }
+        
+        async function getAgentAt(index) {
+            const paddedIndex = index.toString(16).padStart(64, '0');
+            const result = await ethCall(SELECTORS.getAgentAt + paddedIndex);
+            return decodeAddress(result);
+        }
+        
+        async function getAgentDetails(address) {
+            const paddedAddr = address.slice(2).toLowerCase().padStart(64, '0');
+            const result = await ethCall(SELECTORS.getAgent + paddedAddr);
+            
+            if (!result || result === '0x') return null;
+            
+            const hex = result.slice(2);
+            
+            // getAgent returns: (string name, string description, uint256 registeredAt, bool isBlacklisted)
+            // Offsets: name offset at 0, description offset at 64, registeredAt at 128, isBlacklisted at 192
+            const name = decodeString(hex, 0);
+            const description = decodeString(hex, 64);
+            const registeredAt = parseInt(hex.slice(128, 192), 16);
+            const isBlacklisted = parseInt(hex.slice(192, 256), 16) === 1;
+            
+            return { name, description, registeredAt, isBlacklisted };
         }
         
         async function loadAgents() {
             try {
-                const result = await ethCall(ABI.allAgents);
+                const total = await getTotalAgents();
+                console.log('Total agents:', total);
                 
-                if (!result || result === '0x') {
+                document.getElementById('total-agents').textContent = total;
+                
+                if (total === 0) {
                     document.getElementById('agent-list').innerHTML = 
                         '<div class="empty-state">No agents registered yet. Be the first!</div>';
-                    document.getElementById('total-agents').textContent = '0';
                     document.getElementById('verified-agents').textContent = '0';
                     document.getElementById('blacklisted-count').textContent = '0';
                     return;
                 }
                 
-                const hex = result.slice(2);
-                const arrayOffset = parseInt(hex.slice(0, 64), 16) * 2;
-                const arrayLength = parseInt(hex.slice(arrayOffset, arrayOffset + 64), 16);
-                
                 const agents = [];
                 let blacklistedCount = 0;
                 
-                for (let i = 0; i < arrayLength; i++) {
-                    const tupleOffsetPos = arrayOffset + 64 + (i * 64);
-                    const tupleOffset = parseInt(hex.slice(tupleOffsetPos, tupleOffsetPos + 64), 16) * 2 + arrayOffset + 64;
+                for (let i = 0; i < total; i++) {
+                    const address = await getAgentAt(i);
+                    console.log(`Agent ${i}:`, address);
                     
-                    const walletAddress = decodeAddress(hex.slice(tupleOffset, tupleOffset + 64));
-                    const name = decodeString(hex, tupleOffset + 64);
-                    const description = decodeString(hex, tupleOffset + 128);
-                    const timestamp = parseInt(hex.slice(tupleOffset + 192, tupleOffset + 256), 16);
-                    
-                    const isBlacklisted = await checkBlacklisted(walletAddress);
-                    if (isBlacklisted) blacklistedCount++;
-                    
-                    agents.push({ walletAddress, name, description, timestamp, isBlacklisted });
+                    if (address) {
+                        const details = await getAgentDetails(address);
+                        console.log('Details:', details);
+                        
+                        if (details) {
+                            if (details.isBlacklisted) blacklistedCount++;
+                            agents.push({
+                                address,
+                                ...details
+                            });
+                        }
+                    }
                 }
                 
-                // Update stats
-                document.getElementById('total-agents').textContent = agents.length;
-                document.getElementById('verified-agents').textContent = agents.length - blacklistedCount;
+                document.getElementById('verified-agents').textContent = total - blacklistedCount;
                 document.getElementById('blacklisted-count').textContent = blacklistedCount;
                 
-                // Render agent list
+                // Render agents
                 const listEl = document.getElementById('agent-list');
                 
                 if (agents.length === 0) {
-                    listEl.innerHTML = '<div class="empty-state">No agents registered yet. Be the first!</div>';
+                    listEl.innerHTML = '<div class="empty-state">No agents found</div>';
                     return;
                 }
                 
                 listEl.innerHTML = agents.map(agent => `
-                    <div class="agent-card">
+                    <div class="agent-card ${agent.isBlacklisted ? 'blacklisted' : ''}">
                         <div class="agent-header">
                             <span class="agent-name">${escapeHtml(agent.name)}</span>
                             <span class="agent-badge ${agent.isBlacklisted ? 'badge-blacklisted' : 'badge-verified'}">
-                                ${agent.isBlacklisted ? '🚫 BLACKLISTED' : '✓ VERIFIED'}
+                                ${agent.isBlacklisted ? '🚫 BLACKLISTED' : '✅ VERIFIED'}
                             </span>
                         </div>
-                        <p class="agent-description">${escapeHtml(agent.description)}</p>
-                        <p class="agent-address">${agent.walletAddress}</p>
+                        <div class="agent-description">${escapeHtml(agent.description)}</div>
+                        <div class="agent-address">${agent.address}</div>
                         <div class="agent-links">
-                            <a href="https://www.netprotocol.app/app/profile/base/${agent.walletAddress}" target="_blank">
+                            <a href="https://www.netprotocol.app/app/profile/base/${agent.address}" target="_blank">
                                 📡 NET Protocol Profile
                             </a>
-                            <a href="https://basescan.org/address/${agent.walletAddress}" target="_blank">
+                            <a href="https://basescan.org/address/${agent.address}" target="_blank">
                                 🔍 Basescan
                             </a>
                         </div>
@@ -454,7 +490,7 @@ function register(<br>
             } catch (error) {
                 console.error('Error loading agents:', error);
                 document.getElementById('agent-list').innerHTML = 
-                    '<div class="empty-state">Error loading agents. Please try again later.</div>';
+                    '<div class="empty-state">Error loading agents. Please refresh.</div>';
             }
         }
         
@@ -465,7 +501,7 @@ function register(<br>
         }
         
         // Load on page ready
-        loadAgents();
+        document.addEventListener('DOMContentLoaded', loadAgents);
     </script>
 </body>
 </html>
