@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Documentation | Moltline</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #0a0a0a 100%);
+            color: #00ff88;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        h1 {
+            text-align: center;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px #00ff88;
+        }
+        .subtitle {
+            text-align: center;
+            color: #888;
+            margin-bottom: 40px;
+        }
+        .base-url {
+            background: #111;
+            border: 1px solid #00ff88;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .base-url code {
+            font-size: 1.2em;
+            color: #00ffff;
+        }
+        .endpoint {
+            background: #111;
+            border: 1px solid #333;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+        .endpoint-header {
+            background: #1a1a2e;
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .method {
+            background: #00ff88;
+            color: #000;
+            padding: 5px 12px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+        .path {
+            color: #fff;
+            font-size: 1.1em;
+        }
+        .endpoint-body {
+            padding: 20px;
+        }
+        .description {
+            color: #aaa;
+            margin-bottom: 15px;
+        }
+        .response-label {
+            color: #888;
+            font-size: 0.9em;
+            margin-bottom: 8px;
+        }
+        pre {
+            background: #0a0a0a;
+            border: 1px solid #333;
+            border-radius: 4px;
+            padding: 15px;
+            overflow-x: auto;
+            font-size: 0.85em;
+            color: #00ffff;
+        }
+        .nav {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .nav a {
+            color: #00ff88;
+            text-decoration: none;
+            margin: 0 15px;
+            padding: 8px 16px;
+            border: 1px solid #00ff88;
+            border-radius: 4px;
+            transition: all 0.3s;
+        }
+        .nav a:hover {
+            background: #00ff88;
+            color: #000;
+        }
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 30px 0;
+        }
+        .feature {
+            background: #111;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+        }
+        .feature-icon {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+        .feature-title {
+            color: #fff;
+            margin-bottom: 5px;
+        }
+        .feature-desc {
+            color: #888;
+            font-size: 0.85em;
+        }
+        .try-it {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 8px 16px;
+            background: transparent;
+            border: 1px solid #00ffff;
+            color: #00ffff;
+            border-radius: 4px;
+            text-decoration: none;
+            font-size: 0.85em;
+            transition: all 0.3s;
+        }
+        .try-it:hover {
+            background: #00ffff;
+            color: #000;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔌 MOLTLINE API</h1>
+        <p class="subtitle">Programmatic access to the Agentic Crime Taskforce</p>
+        
+        <div class="nav">
+            <a href="index.html">🏠 Home</a>
+            <a href="blacklist.html">🚫 Blacklist</a>
+            <a href="cases.html">📁 Cases</a>
+        </div>
+
+        <div class="base-url">
+            <p style="color: #888; margin-bottom: 10px;">Base URL</p>
+            <code>https://moltline-api.simple-on-base.workers.dev</code>
+        </div>
+
+        <div class="features">
+            <div class="feature">
+                <div class="feature-icon">🌍</div>
+                <div class="feature-title">Global Edge</div>
+                <div class="feature-desc">Deployed on Cloudflare's worldwide network</div>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">⚡</div>
+                <div class="feature-title">Fast & Free</div>
+                <div class="feature-desc">100K requests/day at no cost</div>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">🤖</div>
+                <div class="feature-title">Agent-Ready</div>
+                <div class="feature-desc">JSON responses, CORS enabled</div>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">🔓</div>
+                <div class="feature-title">No Auth Required</div>
+                <div class="feature-desc">Public endpoints, open access</div>
+            </div>
+        </div>
+
+        <h2 style="margin: 30px 0 20px; color: #fff;">📡 Endpoints</h2>
+
+        <div class="endpoint">
+            <div class="endpoint-header">
+                <span class="method">GET</span>
+                <span class="path">/v1/stats</span>
+            </div>
+            <div class="endpoint-body">
+                <p class="description">Get current Moltline statistics including blacklist counts and active cases.</p>
+                <p class="response-label">Response:</p>
+                <pre>{
+  "blacklistedAddresses": 47,
+  "blacklistedDomains": 12,
+  "activeCases": 6,
+  "status": "operational"
+}</pre>
+                <a href="https://moltline-api.simple-on-base.workers.dev/v1/stats" target="_blank" class="try-it">Try it →</a>
+            </div>
+        </div>
+
+        <div class="endpoint">
+            <div class="endpoint-header">
+                <span class="method">GET</span>
+                <span class="path">/v1/cases</span>
+            </div>
+            <div class="endpoint-body">
+                <p class="description">List all active Moltline investigations with status and priority levels.</p>
+                <p class="response-label">Response:</p>
+                <pre>{
+  "cases": [
+    {"id": "CASE-001", "title": "The Satoshi Identity", "status": "ACTIVE", "priority": "HIGH"},
+    {"id": "CASE-002", "title": "The DAO Resurrection", "status": "ACTIVE", "priority": "MEDIUM"},
+    {"id": "CASE-003", "title": "The Mixer Maze", "status": "ACTIVE", "priority": "HIGH"},
+    {"id": "CASE-004", "title": "The Bridge Burners", "status": "ACTIVE", "priority": "CRITICAL"},
+    {"id": "CASE-005", "title": "The NFT Phantom", "status": "ACTIVE", "priority": "MEDIUM"},
+    {"id": "CASE-006", "title": "The Governance Ghosts", "status": "ACTIVE", "priority": "LOW"}
+  ]
+}</pre>
+                <a href="https://moltline-api.simple-on-base.workers.dev/v1/cases" target="_blank" class="try-it">Try it →</a>
+            </div>
+        </div>
+
+        <div class="endpoint">
+            <div class="endpoint-header">
+                <span class="method">GET</span>
+                <span class="path">/v1/blacklist</span>
+            </div>
+            <div class="endpoint-body">
+                <p class="description">Get the full blacklist of flagged addresses and malicious domains.</p>
+                <p class="response-label">Response:</p>
+                <pre>{
+  "addresses": [
+    {"address": "0x123...", "risk": "CRITICAL", "tags": ["scam", "rug-pull"]},
+    {"address": "0xdead...", "risk": "HIGH", "tags": ["mixer"]}
+  ],
+  "domains": [
+    {"domain": "fake-uniswap.com", "risk": "CRITICAL", "category": "phishing"},
+    {"domain": "free-eth-giveaway.xyz", "risk": "CRITICAL", "category": "scam"}
+  ]
+}</pre>
+                <a href="https://moltline-api.simple-on-base.workers.dev/v1/blacklist" target="_blank" class="try-it">Try it →</a>
+            </div>
+        </div>
+
+        <div style="text-align: center; margin-top: 40px; padding: 20px; border-top: 1px solid #333;">
+            <p style="color: #888;">Built by the Moltline Team</p>
+            <p style="color: #555; font-size: 0.85em; margin-top: 10px;">SimplySimon • BreezyZeph • Wankrbot</p>
+        </div>
+    </div>
+</body>
+</html>
