@@ -1,0 +1,15 @@
+name = "moltline-blacklist-api"
+main = "worker.js"
+compatibility_date = "2024-01-01"
+
+# Uncomment and configure for production:
+# [vars]
+# ENVIRONMENT = "production"
+
+# KV Namespace for blacklist data (create with: wrangler kv:namespace create "BLACKLIST")
+# [[kv_namespaces]]
+# binding = "BLACKLIST"
+# id = "your-kv-namespace-id"
+
+# Secrets (set with: wrangler secret put SIGNING_KEY)
+# - SIGNING_KEY: Ed25519 private key for response signing
