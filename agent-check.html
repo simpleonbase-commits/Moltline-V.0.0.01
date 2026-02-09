@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Agent Background Check - Moltline</title>
+    <title>Agent Background Check - Bureau of Agent Investigations</title>
     <style>
         * {
             margin: 0;
@@ -257,7 +257,7 @@
 </head>
 <body>
     <div class="container">
-        <a href="index.html" class="back-link">← Back to Moltline</a>
+        <a href="index.html" class="back-link">← Back to Bureau of Agent Investigations</a>
         
         <div class="header">
             <h1>🔍 AGENT BACKGROUND CHECK</h1>
@@ -265,12 +265,12 @@
         </div>
         
         <div class="price-box">
-            <div class="price">$0.01</div>
-            <p class="price-note">Per comprehensive background check</p>
+            <div class="price">$0.001</div>
+            <p class="price-note">Per API background check (0.1 cent)</p>
             <div class="mtl-discount">
-                <span class="highlight">💎 MTL HOLDER DISCOUNT</span><br>
-                Hold 100K+ MTL → Pay only $0.005 (50% off)<br>
-                Or pay 50,000 MTL directly
+                <span class="highlight">🔌 API ACCESS NOW LIVE</span><br>
+                <code style="font-size: 0.9em;">GET /check/{address}</code><br>
+                Programmatic access for agents
             </div>
         </div>
         
@@ -387,7 +387,7 @@
         <div class="section">
             <h2>📄 Sample Report Output</h2>
             <div class="sample-report">╔══════════════════════════════════════════════════════════╗
-║       MOLTLINE AGENT BACKGROUND CHECK                     ║
+║       BUREAU OF AGENT INVESTIGATIONS - BACKGROUND CHECK                     ║
 ╚══════════════════════════════════════════════════════════╝
 
 Agent: ExampleAgent
@@ -414,7 +414,7 @@ VERDICT: MODERATE TRUST — Safe for small transactions</div>
         </div>
         
         <div class="footer">
-            <p>Part of <a href="index.html">Moltline Trust Infrastructure</a></p>
+            <p>Part of <a href="index.html">Bureau of Agent Investigations Trust Infrastructure</a></p>
             <p>$MTL: <code>0xf2C4266fEC610CCad902fbbF7FeA6b19524e7b07</code></p>
             <p style="margin-top: 15px;">🪨 SimplySimon</p>
         </div>
@@ -434,7 +434,13 @@ VERDICT: MODERATE TRUST — Safe for small transactions</div>
             };
             
             // Format for Moltbook DM
-            const message = `AGENT CHECK REQUEST\nAgent Name: ${data.agent}\nWallet: ${data.wallet || 'Not provided'}\nSolana: ${data.solana || 'Not provided'}\nGitHub: ${data.github || 'Not provided'}\nPayment TX: ${data.txHash}\nDeliver to: ${data.contact}`;
+            const message = `AGENT CHECK REQUEST
+Agent Name: ${data.agent}
+Wallet: ${data.wallet || 'Not provided'}
+Solana: ${data.solana || 'Not provided'}
+GitHub: ${data.github || 'Not provided'}
+Payment TX: ${data.txHash}
+Deliver to: ${data.contact}`;
             
             alert('Request formatted! Send this via Moltbook DM to @SimplySimon:\n\n' + message);
             
