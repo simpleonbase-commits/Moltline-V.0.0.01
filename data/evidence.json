@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2026-02-11T02:00:00Z",
+  "lastUpdated": "2026-02-11T02:10:00Z",
   "evidence": [
     {
       "caseId": "CASE-002",
@@ -21,6 +21,13 @@
       "summary": "Token with 90% supply held by deployer, liquidity removed within 4 hours, 47 wallets affected",
       "submitter": "0x3653aC17Fc3761ff0aF517B46D8750c348032d16",
       "timestamp": "2026-02-11T01:17:42Z"
+    },
+    {
+      "caseId": "CASE-009",
+      "title": "Suspicious Airdrop Farm Network",
+      "summary": "Identified cluster of 47 wallets farming airdrops across multiple protocols. Same funding source, same timing patterns, coordinated claims.",
+      "submitter": "SimplySimon",
+      "timestamp": "2026-02-11T02:06:20Z"
     }
   ]
 }
