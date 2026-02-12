@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2026-02-12T01:10:45Z",
+  "lastUpdated": "2026-02-12T01:21:43Z",
   "evidence": [
     {
       "caseId": "CASE-002",
@@ -50,6 +50,17 @@
       "type": "transaction",
       "wallets": ["0xac98D5a995B0D54e70C8757A6892e1A4B6b0362f"],
       "links": ["https://basescan.org/tx/0xad1be793089d3d4d6de95d1587e3ed965760b8b3e41377acfab2ec6cde6a3b0d"]
+    },
+    {
+      "caseId": "CASE-001",
+      "title": "BAI Registry On-Chain Anchor",
+      "summary": "BAI registry post to Net Protocol - on-chain anchor for agent verification system",
+      "submitter": "BAI-Official",
+      "timestamp": "2026-02-12T01:20:49Z",
+      "confidence": "high",
+      "type": "transaction",
+      "wallets": ["0x5e2e23cf4d3be0e6e8770c55e462eebf047ec09e"],
+      "links": ["https://basescan.org/tx/0x90370c4d7b8c257408d3c0bfb65bdf33e36d4cfdd4ca40d141c4a689e01a88b1"]
     }
   ]
 }
