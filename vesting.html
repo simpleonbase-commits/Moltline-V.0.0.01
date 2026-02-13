@@ -667,16 +667,23 @@
         const RPC_URL = 'https://mainnet.base.org';
         const BASE_CHAIN_ID = 8453;
         
+        // Fixed ABI to match BAIVesting.sol contract
         const VESTING_ABI = [
-            "function token() view returns (address)",
-            "function LOCK_DURATION() view returns (uint256)",
-            "function depositCount(address) view returns (uint256)",
-            "function deposits(address, uint256) view returns (uint256 amount, uint256 depositTime, bool withdrawn)",
-            "function deposit(uint256 amount)",
-            "function depositSelf()",
-            "function withdraw(uint256 depositIndex)",
-            "event TokensDeposited(address indexed depositor, uint256 amount, uint256 depositTime)",
-            "event TokensWithdrawn(address indexed depositor, uint256 depositIndex, uint256 amount)"
+            "function vestingToken() view returns (address)",
+            "function VESTING_DURATION() view returns (uint256)",
+            "function getDepositCount(address) view returns (uint256)",
+            "function deposits(address, uint256) view returns (uint256 amount, uint256 depositTime, uint256 unlockTime, bool withdrawn, string memo)",
+            "function depositSelf(uint256 amount, string memo)",
+            "function withdraw(uint256 depositId)",
+            "function withdrawAll() returns (uint256)",
+            "function getDeposit(address, uint256) view returns (uint256 amount, uint256 depositTime, uint256 unlockTime, bool withdrawn, string memo)",
+            "function getUnlockedBalance(address) view returns (uint256)",
+            "function getLockedBalance(address) view returns (uint256)",
+            "function getAllDeposits(address) view returns (uint256[] amounts, uint256[] depositTimes, uint256[] unlockTimes, bool[] withdrawnFlags)",
+            "function totalVested() view returns (uint256)",
+            "function totalDepositCount() view returns (uint256)",
+            "event TokensDeposited(address indexed beneficiary, uint256 indexed depositId, uint256 amount, uint256 depositTime, uint256 unlockTime, string memo)",
+            "event TokensWithdrawn(address indexed beneficiary, uint256 indexed depositId, uint256 amount, uint256 withdrawTime)"
         ];
         
         const ERC20_ABI = [
@@ -918,7 +925,8 @@
                 const decimals = await tokenContract.decimals();
                 const amountWei = ethers.utils.parseUnits(amount.toString(), decimals);
                 
-                const tx = await vestingContract.deposit(amountWei);
+                // Fixed: use depositSelf with memo parameter
+                const tx = await vestingContract.depositSelf(amountWei, "");
                 
                 showStatus('Waiting for transaction confirmation...', 'info');
                 addTerminalLine(`Deposit TX submitted: ${tx.hash.slice(0, 10)}...`, 'info');
@@ -972,8 +980,8 @@
                 
                 document.getElementById('total-locked').textContent = formatNumber(parseFloat(formattedBalance));
                 
-                // Get lock duration
-                const lockDuration = await readVesting.LOCK_DURATION();
+                // Fixed: use VESTING_DURATION instead of LOCK_DURATION
+                const lockDuration = await readVesting.VESTING_DURATION();
                 const lockDays = lockDuration.toNumber() / 86400;
                 addTerminalLine(`Lock Duration: ${lockDays} days`, 'info');
                 
@@ -982,6 +990,7 @@
                 // Fetch deposit events
                 addTerminalLine('Fetching deposit events...', 'info');
                 
+                // Fixed: event signature matches contract
                 const depositFilter = readVesting.filters.TokensDeposited();
                 const events = await readVesting.queryFilter(depositFilter, -100000);
                 
@@ -989,8 +998,8 @@
                 
                 document.getElementById('deposit-count').textContent = events.length;
                 
-                // Get unique depositors
-                const uniqueDepositors = new Set(events.map(e => e.args.depositor));
+                // Fixed: event args use 'beneficiary' not 'depositor'
+                const uniqueDepositors = new Set(events.map(e => e.args.beneficiary));
                 document.getElementById('unique-depositors').textContent = uniqueDepositors.size;
                 
                 addTerminalLine(`Unique Depositors: ${uniqueDepositors.size}`, 'info');
@@ -1043,10 +1052,12 @@
             `;
             
             for (const event of sortedEvents.slice(0, 20)) {
-                const depositor = event.args.depositor;
+                // Fixed: use 'beneficiary' instead of 'depositor'
+                const depositor = event.args.beneficiary;
                 const amount = ethers.utils.formatUnits(event.args.amount, decimals);
                 const depositTime = event.args.depositTime.toNumber();
-                const unlockTime = depositTime + lockDuration;
+                // Fixed: unlockTime is now directly available in event
+                const unlockTime = event.args.unlockTime.toNumber();
                 const now = Math.floor(Date.now() / 1000);
                 const isUnlocked = now >= unlockTime;
                 
