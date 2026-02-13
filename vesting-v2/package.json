@@ -1,0 +1,22 @@
+{
+  "name": "bai-vesting-v2",
+  "version": "2.0.0",
+  "description": "BAI 2-Year Token Vesting Contract",
+  "scripts": {
+    "compile": "npx hardhat compile",
+    "test": "npx hardhat test",
+    "flatten": "npx hardhat flatten contracts/BAIVesting.sol > BAIVesting_Flattened.sol",
+    "deploy:base": "npx hardhat run scripts/deploy.js --network base",
+    "deploy:sepolia": "npx hardhat run scripts/deploy.js --network baseSepolia",
+    "verify:base": "npx hardhat verify --network base",
+    "verify:sepolia": "npx hardhat verify --network baseSepolia"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^4.0.0",
+    "hardhat": "^2.22.0",
+    "dotenv": "^16.4.0"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^5.0.0"
+  }
+}
