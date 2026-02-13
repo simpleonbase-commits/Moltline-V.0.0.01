@@ -94,13 +94,30 @@
             border: 1px solid #1a1a2e;
             border-radius: 12px;
             padding: 15px 25px;
-            display: inline-block;
+            display: inline-flex;
+            align-items: center;
+            gap: 15px;
             margin-top: 15px;
         }
 
         .wallet-address {
             font-family: monospace;
             color: #4ade80;
+        }
+
+        .disconnect-btn {
+            background: #2a2a3e;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 8px;
+            color: #ff6b6b;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .disconnect-btn:hover {
+            background: #3a3a4e;
         }
 
         /* Stats Grid */
@@ -442,6 +459,40 @@
             background: #1a1a2e;
         }
 
+        /* Wallet Options */
+        .wallet-options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .wallet-option {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px 20px;
+            background: #1a1a2e;
+            border: 1px solid #2a2a3e;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .wallet-option:hover {
+            background: #252535;
+            border-color: #ffa500;
+        }
+
+        .wallet-option-icon {
+            font-size: 1.5rem;
+        }
+
+        .wallet-option-name {
+            font-weight: 600;
+            color: #fff;
+        }
+
         /* Footer */
         footer {
             text-align: center;
@@ -512,11 +563,12 @@
 
         <!-- Connect Wallet -->
         <div class="connect-section">
-            <button class="connect-btn" id="connectBtn" onclick="connectWallet()">
+            <button class="connect-btn" id="connectBtn" onclick="openConnectModal()">
                 🔗 Connect Wallet
             </button>
             <div class="wallet-info" id="walletInfo" style="display: none;">
-                Connected: <span class="wallet-address" id="walletAddress"></span>
+                <span>Connected: <span class="wallet-address" id="walletAddress"></span></span>
+                <button class="disconnect-btn" onclick="disconnectWallet()">Disconnect</button>
             </div>
         </div>
 
@@ -666,7 +718,18 @@
         </footer>
     </div>
 
-    <script>
+    <!-- Ethers.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.9.0/ethers.umd.min.js"></script>
+    
+    <!-- Web3Modal / WalletConnect -->
+    <script type="module">
+        import { createAppKit, useAppKitProvider, useAppKitAccount } from 'https://cdn.jsdelivr.net/npm/@reown/appkit@1.6.8/+esm';
+        import { EthersAdapter } from 'https://cdn.jsdelivr.net/npm/@reown/appkit-adapter-ethers@1.6.8/+esm';
+        import { base } from 'https://cdn.jsdelivr.net/npm/@reown/appkit@1.6.8/networks/+esm';
+
+        // WalletConnect Project ID
+        const projectId = '286e939deb1fd152d44312f068de95da';
+
         // Contract addresses
         const STAKING_ADDRESS = '0x4b5b62Bde4Be0fBab30A74d79c7Cb25FD242c3Cc';
         const TOKEN_ADDRESS = '0x2ca8b2b97bc0f0ccdd875dcfeff16b868a1b5ba3';
@@ -695,76 +758,78 @@
             'function symbol() view returns (string)'
         ];
 
+        // Metadata
+        const metadata = {
+            name: 'BAI Diamond Hands Staking',
+            description: 'Paper Hands Pay, Diamond Hands Gain - Stake BAItest tokens',
+            url: 'https://simpleonbase-commits.github.io/BAI-V.0.0.01/',
+            icons: ['https://simpleonbase-commits.github.io/BAI-V.0.0.01/favicon.ico']
+        };
+
+        // Create AppKit
+        const appKit = createAppKit({
+            adapters: [new EthersAdapter()],
+            networks: [base],
+            projectId,
+            metadata,
+            features: {
+                analytics: false
+            },
+            themeMode: 'dark',
+            themeVariables: {
+                '--w3m-accent': '#ffa500',
+                '--w3m-color-mix': '#ff6b6b',
+                '--w3m-color-mix-strength': 20
+            }
+        });
+
+        // Global state
         let provider, signer, userAddress;
         let stakingContract, tokenContract;
         let tokenDecimals = 18;
-        let userStakeAmount = 0;
+        let userStakeAmount = 0n;
         let userUnlocked = true;
         let userUnlockTime = 0;
 
-        // Tab switching
-        function showTab(tabName) {
-            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById(tabName + 'Tab').classList.add('active');
-            event.target.classList.add('active');
+        // Make appKit available globally
+        window.appKit = appKit;
+
+        // Open connect modal
+        window.openConnectModal = async function() {
+            await appKit.open();
+        };
+
+        // Disconnect
+        window.disconnectWallet = async function() {
+            await appKit.disconnect();
+            resetUI();
+        };
+
+        // Reset UI
+        function resetUI() {
+            document.getElementById('connectBtn').style.display = 'block';
+            document.getElementById('walletInfo').style.display = 'none';
+            document.getElementById('stakeBtn').disabled = true;
+            document.getElementById('stakeBtn').textContent = 'Connect Wallet to Stake';
+            document.getElementById('unstakeBtn').disabled = true;
+            document.getElementById('unstakeBtn').textContent = 'Connect Wallet to Unstake';
+            document.getElementById('claimBtn').disabled = true;
+            document.getElementById('claimBtn').textContent = 'Connect Wallet to Claim';
+            document.getElementById('exitBtn').disabled = true;
+            provider = null;
+            signer = null;
+            userAddress = null;
         }
 
-        // Connect wallet
-        async function connectWallet() {
-            if (typeof window.ethereum === 'undefined') {
-                alert('Please install MetaMask to use this dApp');
-                return;
-            }
-
-            try {
-                const btn = document.getElementById('connectBtn');
-                btn.innerHTML = '<span class="spinner"></span>Connecting...';
-                btn.disabled = true;
-
-                // Request accounts
-                await window.ethereum.request({ method: 'eth_requestAccounts' });
-                
-                // Check network (Base = 8453)
-                const chainId = await window.ethereum.request({ method: 'eth_chainId' });
-                if (chainId !== '0x2105') {
-                    try {
-                        await window.ethereum.request({
-                            method: 'wallet_switchEthereumChain',
-                            params: [{ chainId: '0x2105' }]
-                        });
-                    } catch (switchError) {
-                        if (switchError.code === 4902) {
-                            await window.ethereum.request({
-                                method: 'wallet_addEthereumChain',
-                                params: [{
-                                    chainId: '0x2105',
-                                    chainName: 'Base',
-                                    nativeCurrency: { name: 'ETH', symbol: 'ETH', decimals: 18 },
-                                    rpcUrls: ['https://mainnet.base.org'],
-                                    blockExplorerUrls: ['https://basescan.org']
-                                }]
-                            });
-                        } else {
-                            throw switchError;
-                        }
-                    }
-                }
-
-                // Setup ethers
-                provider = new ethers.BrowserProvider(window.ethereum);
-                signer = await provider.getSigner();
-                userAddress = await signer.getAddress();
-
-                // Setup contracts
-                stakingContract = new ethers.Contract(STAKING_ADDRESS, STAKING_ABI, signer);
-                tokenContract = new ethers.Contract(TOKEN_ADDRESS, ERC20_ABI, signer);
-
-                // Update UI
-                document.getElementById('walletInfo').style.display = 'inline-block';
+        // Subscribe to account changes
+        appKit.subscribeAccount(async (account) => {
+            console.log('Account changed:', account);
+            if (account.isConnected && account.address) {
+                userAddress = account.address;
+                document.getElementById('connectBtn').style.display = 'none';
+                document.getElementById('walletInfo').style.display = 'inline-flex';
                 document.getElementById('walletAddress').textContent = 
                     userAddress.slice(0, 6) + '...' + userAddress.slice(-4);
-                btn.style.display = 'none';
 
                 // Enable buttons
                 document.getElementById('stakeBtn').disabled = false;
@@ -775,27 +840,39 @@
                 document.getElementById('claimBtn').textContent = '🎁 Claim Rewards';
                 document.getElementById('exitBtn').disabled = false;
 
-                // Load data
-                await refreshData();
-
-                // Listen for account changes
-                window.ethereum.on('accountsChanged', () => window.location.reload());
-                window.ethereum.on('chainChanged', () => window.location.reload());
-
-            } catch (error) {
-                console.error('Connection error:', error);
-                alert('Failed to connect: ' + error.message);
-                const btn = document.getElementById('connectBtn');
-                btn.innerHTML = '🔗 Connect Wallet';
-                btn.disabled = false;
+                // Setup provider and contracts
+                try {
+                    const walletProvider = appKit.getWalletProvider();
+                    if (walletProvider) {
+                        provider = new ethers.BrowserProvider(walletProvider);
+                        signer = await provider.getSigner();
+                        stakingContract = new ethers.Contract(STAKING_ADDRESS, STAKING_ABI, signer);
+                        tokenContract = new ethers.Contract(TOKEN_ADDRESS, ERC20_ABI, signer);
+                        await refreshData();
+                    }
+                } catch (err) {
+                    console.error('Setup error:', err);
+                }
+            } else {
+                resetUI();
             }
-        }
+        });
+
+        // Tab switching
+        window.showTab = function(tabName) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(tabName + 'Tab').classList.add('active');
+            event.target.classList.add('active');
+        };
 
         // Refresh all data
         async function refreshData() {
+            if (!stakingContract || !tokenContract || !userAddress) return;
+            
             try {
                 // Get token decimals
-                tokenDecimals = await tokenContract.decimals();
+                tokenDecimals = Number(await tokenContract.decimals());
 
                 // Total staked
                 const total = await stakingContract.totalStaked();
@@ -848,9 +925,11 @@
                 console.error('Error refreshing data:', error);
             }
         }
+        window.refreshData = refreshData;
 
         // Check token allowance
         async function checkAllowance() {
+            if (!tokenContract || !userAddress) return;
             const allowance = await tokenContract.allowance(userAddress, STAKING_ADDRESS);
             const balance = await tokenContract.balanceOf(userAddress);
             
@@ -869,6 +948,7 @@
             if (num < 0.01) return '<0.01';
             return num.toLocaleString(undefined, { maximumFractionDigits: 2 });
         }
+        window.formatAmount = formatAmount;
 
         // Update countdown
         function updateCountdown() {
@@ -893,7 +973,7 @@
         }
 
         // Update penalty preview
-        function updatePenaltyPreview() {
+        window.updatePenaltyPreview = function() {
             const amount = document.getElementById('unstakeAmount').value;
             if (!amount || isNaN(amount) || parseFloat(amount) <= 0) {
                 document.getElementById('penaltyPreview').textContent = '-- BAItest';
@@ -913,23 +993,23 @@
                 document.getElementById('receiveAmount').textContent = receive.toFixed(2) + ' BAItest';
                 document.getElementById('penaltyAmount').textContent = penalty.toFixed(2);
             }
-        }
+        };
 
         // Set max stake
-        async function setMaxStake() {
-            if (!tokenContract) return;
+        window.setMaxStake = async function() {
+            if (!tokenContract || !userAddress) return;
             const balance = await tokenContract.balanceOf(userAddress);
             document.getElementById('stakeAmount').value = ethers.formatUnits(balance, tokenDecimals);
-        }
+        };
 
         // Set max unstake
-        function setMaxUnstake() {
+        window.setMaxUnstake = function() {
             document.getElementById('unstakeAmount').value = ethers.formatUnits(userStakeAmount, tokenDecimals);
-            updatePenaltyPreview();
-        }
+            window.updatePenaltyPreview();
+        };
 
         // Approve tokens
-        async function approveTokens() {
+        window.approveTokens = async function() {
             try {
                 const btn = document.getElementById('approveBtn');
                 btn.innerHTML = '<span class="spinner"></span>Approving...';
@@ -949,10 +1029,10 @@
                 btn.innerHTML = 'Approve BAItest';
                 btn.disabled = false;
             }
-        }
+        };
 
         // Stake tokens
-        async function stakeTokens() {
+        window.stakeTokens = async function() {
             try {
                 const amount = document.getElementById('stakeAmount').value;
                 if (!amount || parseFloat(amount) <= 0) {
@@ -979,10 +1059,10 @@
                 document.getElementById('stakeBtn').innerHTML = '💎 Stake BAItest';
                 document.getElementById('stakeBtn').disabled = false;
             }
-        }
+        };
 
         // Unstake tokens
-        async function unstakeTokens() {
+        window.unstakeTokens = async function() {
             try {
                 const amount = document.getElementById('unstakeAmount').value;
                 if (!amount || parseFloat(amount) <= 0) {
@@ -1016,10 +1096,10 @@
                 document.getElementById('unstakeBtn').innerHTML = '📤 Unstake';
                 document.getElementById('unstakeBtn').disabled = false;
             }
-        }
+        };
 
         // Claim rewards
-        async function claimRewards() {
+        window.claimRewards = async function() {
             try {
                 const btn = document.getElementById('claimBtn');
                 btn.innerHTML = '<span class="spinner"></span>Claiming...';
@@ -1038,13 +1118,14 @@
                 document.getElementById('claimBtn').innerHTML = '🎁 Claim Rewards';
                 document.getElementById('claimBtn').disabled = false;
             }
-        }
+        };
 
         // Exit all
-        async function exitAll() {
+        window.exitAll = async function() {
             try {
                 if (!userUnlocked && userStakeAmount > 0n) {
-                    const penalty = formatAmount(userStakeAmount * 20n / 100n);
+                    const penaltyAmount = userStakeAmount * 20n / 100n;
+                    const penalty = formatAmount(penaltyAmount);
                     if (!confirm(`⚠️ Early exit warning!\n\nYou will lose approximately ${penalty} BAItest (20% penalty).\n\nProceed anyway?`)) {
                         return;
                     }
@@ -1067,13 +1148,10 @@
                 document.getElementById('exitBtn').innerHTML = '🚪 Exit All (Unstake + Claim)';
                 document.getElementById('exitBtn').disabled = false;
             }
-        }
+        };
 
         // Update countdown every minute
         setInterval(updateCountdown, 60000);
     </script>
-
-    <!-- Ethers.js -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.9.0/ethers.umd.min.js"></script>
 </body>
 </html>
