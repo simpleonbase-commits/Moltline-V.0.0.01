@@ -382,6 +382,11 @@ contract BAIVesting is ReentrancyGuard {
     /**
      * @notice Withdraw all unlocked deposits
      * @return totalAmount Total amount withdrawn
+     * 
+     * ⚠️ GAS WARNING: If you have 500+ deposits, this function may run out of gas.
+     * RECOMMENDATION: After 2 years, call withdrawAll() periodically (monthly) 
+     * rather than waiting to withdraw 730+ deposits at once.
+     * You can always use withdraw(depositId) individually if this hits gas limits.
      */
     function withdrawAll() external nonReentrant returns (uint256 totalAmount) {
         Deposit[] storage userDeposits = deposits[msg.sender];
@@ -408,10 +413,25 @@ contract BAIVesting is ReentrancyGuard {
 
     // ============ View Functions ============
     
+    /**
+     * @notice Get the number of deposits for an address
+     * @param beneficiary The address to query
+     * @return The number of deposits
+     */
     function getDepositCount(address beneficiary) external view returns (uint256) {
         return deposits[beneficiary].length;
     }
     
+    /**
+     * @notice Get deposit details
+     * @param beneficiary The address to query
+     * @param depositId The deposit ID
+     * @return amount The deposit amount
+     * @return depositTime When the deposit was made
+     * @return unlockTime When tokens unlock
+     * @return withdrawn Whether already withdrawn
+     * @return memo The deposit memo
+     */
     function getDeposit(
         address beneficiary,
         uint256 depositId
@@ -427,6 +447,11 @@ contract BAIVesting is ReentrancyGuard {
         return (dep.amount, dep.depositTime, dep.unlockTime, dep.withdrawn, dep.memo);
     }
     
+    /**
+     * @notice Get total unlocked (withdrawable) balance
+     * @param beneficiary The address to query
+     * @return unlocked Total amount available to withdraw
+     */
     function getUnlockedBalance(address beneficiary) external view returns (uint256 unlocked) {
         Deposit[] storage userDeposits = deposits[beneficiary];
         uint256 len = userDeposits.length;
@@ -439,6 +464,11 @@ contract BAIVesting is ReentrancyGuard {
         }
     }
     
+    /**
+     * @notice Get total locked (still vesting) balance
+     * @param beneficiary The address to query
+     * @return locked Total amount still locked
+     */
     function getLockedBalance(address beneficiary) external view returns (uint256 locked) {
         Deposit[] storage userDeposits = deposits[beneficiary];
         uint256 len = userDeposits.length;
@@ -451,6 +481,14 @@ contract BAIVesting is ReentrancyGuard {
         }
     }
     
+    /**
+     * @notice Get all deposits for an address (for UI display)
+     * @param beneficiary The address to query
+     * @return amounts Array of deposit amounts
+     * @return depositTimes Array of deposit timestamps
+     * @return unlockTimes Array of unlock timestamps
+     * @return withdrawnFlags Array of withdrawn flags
+     */
     function getAllDeposits(address beneficiary) external view returns (
         uint256[] memory amounts,
         uint256[] memory depositTimes,
@@ -473,12 +511,24 @@ contract BAIVesting is ReentrancyGuard {
         }
     }
     
+    /**
+     * @notice Check if a deposit is unlocked
+     * @param beneficiary The address to query
+     * @param depositId The deposit ID
+     * @return True if unlocked and not withdrawn
+     */
     function isUnlocked(address beneficiary, uint256 depositId) external view returns (bool) {
         if (depositId >= deposits[beneficiary].length) return false;
         Deposit storage dep = deposits[beneficiary][depositId];
         return !dep.withdrawn && block.timestamp >= dep.unlockTime;
     }
     
+    /**
+     * @notice Get time remaining until unlock
+     * @param beneficiary The address to query
+     * @param depositId The deposit ID
+     * @return secondsRemaining Seconds until unlock (0 if unlocked)
+     */
     function timeUntilUnlock(
         address beneficiary,
         uint256 depositId
