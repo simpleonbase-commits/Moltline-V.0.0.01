@@ -120,6 +120,139 @@
             background: #3a3a4e;
         }
 
+        /* Wallet Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background: #12121a;
+            border: 1px solid #2a2a3e;
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 400px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .modal-title {
+            font-size: 1.3rem;
+            color: #fff;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: #888;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        .modal-close:hover {
+            color: #fff;
+        }
+
+        .wallet-options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .wallet-option {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 16px 20px;
+            background: #1a1a2e;
+            border: 1px solid #2a2a3e;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .wallet-option:hover {
+            background: #252535;
+            border-color: #ffa500;
+        }
+
+        .wallet-option.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .wallet-option.disabled:hover {
+            background: #1a1a2e;
+            border-color: #2a2a3e;
+        }
+
+        .wallet-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .wallet-icon.metamask {
+            background: linear-gradient(135deg, #f5841f, #e27625);
+        }
+
+        .wallet-icon.coinbase {
+            background: #0052ff;
+        }
+
+        .wallet-icon.walletconnect {
+            background: linear-gradient(135deg, #3b99fc, #2d7dd2);
+        }
+
+        .wallet-name {
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .wallet-desc {
+            font-size: 0.8rem;
+            color: #888;
+        }
+
+        .wallet-status {
+            margin-left: auto;
+            font-size: 0.75rem;
+            padding: 4px 8px;
+            border-radius: 4px;
+            background: #2a4a2a;
+            color: #4ade80;
+        }
+
+        .wallet-status.not-installed {
+            background: #3a2a2a;
+            color: #888;
+        }
+
         /* Stats Grid */
         .stats-grid {
             display: grid;
@@ -459,40 +592,6 @@
             background: #1a1a2e;
         }
 
-        /* Wallet Options */
-        .wallet-options {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            margin-bottom: 20px;
-        }
-
-        .wallet-option {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            padding: 15px 20px;
-            background: #1a1a2e;
-            border: 1px solid #2a2a3e;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .wallet-option:hover {
-            background: #252535;
-            border-color: #ffa500;
-        }
-
-        .wallet-option-icon {
-            font-size: 1.5rem;
-        }
-
-        .wallet-option-name {
-            font-weight: 600;
-            color: #fff;
-        }
-
         /* Footer */
         footer {
             text-align: center;
@@ -526,6 +625,27 @@
 
         @keyframes spin {
             to { transform: rotate(360deg); }
+        }
+
+        /* Network Warning */
+        .network-warning {
+            background: linear-gradient(135deg, #2a1a1a 0%, #1a1210 100%);
+            border: 1px solid #ff6b6b;
+            border-radius: 12px;
+            padding: 15px 20px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .network-warning button {
+            background: #ff6b6b;
+            color: #000;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
         }
 
         /* Responsive */
@@ -563,13 +683,19 @@
 
         <!-- Connect Wallet -->
         <div class="connect-section">
-            <button class="connect-btn" id="connectBtn" onclick="openConnectModal()">
+            <button class="connect-btn" id="connectBtn" onclick="openWalletModal()">
                 🔗 Connect Wallet
             </button>
             <div class="wallet-info" id="walletInfo" style="display: none;">
                 <span>Connected: <span class="wallet-address" id="walletAddress"></span></span>
                 <button class="disconnect-btn" onclick="disconnectWallet()">Disconnect</button>
             </div>
+        </div>
+
+        <!-- Network Warning -->
+        <div class="network-warning" id="networkWarning" style="display: none;">
+            <div>⚠️ Wrong Network - Please switch to Base</div>
+            <button onclick="switchToBase()">Switch to Base</button>
         </div>
 
         <!-- Stats -->
@@ -601,9 +727,9 @@
 
             <!-- Tabs -->
             <div class="tabs">
-                <button class="tab-btn active" onclick="showTab('stake')">Stake</button>
-                <button class="tab-btn" onclick="showTab('unstake')">Unstake</button>
-                <button class="tab-btn" onclick="showTab('rewards')">Rewards</button>
+                <button class="tab-btn active" onclick="showTab('stake', this)">Stake</button>
+                <button class="tab-btn" onclick="showTab('unstake', this)">Unstake</button>
+                <button class="tab-btn" onclick="showTab('rewards', this)">Rewards</button>
             </div>
 
             <!-- Stake Tab -->
@@ -718,23 +844,57 @@
         </footer>
     </div>
 
+    <!-- Wallet Modal -->
+    <div class="modal-overlay" id="walletModal" onclick="closeWalletModal(event)">
+        <div class="modal" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <h3 class="modal-title">Connect Wallet</h3>
+                <button class="modal-close" onclick="closeWalletModal()">&times;</button>
+            </div>
+            <div class="wallet-options">
+                <div class="wallet-option" id="metamaskOption" onclick="connectMetaMask()">
+                    <div class="wallet-icon metamask">🦊</div>
+                    <div>
+                        <div class="wallet-name">MetaMask</div>
+                        <div class="wallet-desc">Connect using browser extension</div>
+                    </div>
+                    <span class="wallet-status" id="metamaskStatus">Checking...</span>
+                </div>
+                <div class="wallet-option" id="coinbaseOption" onclick="connectCoinbase()">
+                    <div class="wallet-icon coinbase">🟦</div>
+                    <div>
+                        <div class="wallet-name">Coinbase Wallet</div>
+                        <div class="wallet-desc">Connect using Coinbase</div>
+                    </div>
+                    <span class="wallet-status" id="coinbaseStatus">Checking...</span>
+                </div>
+                <div class="wallet-option" onclick="connectWalletConnect()">
+                    <div class="wallet-icon walletconnect">📱</div>
+                    <div>
+                        <div class="wallet-name">WalletConnect</div>
+                        <div class="wallet-desc">Scan QR code with mobile wallet</div>
+                    </div>
+                    <span class="wallet-status">Available</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Ethers.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.9.0/ethers.umd.min.js"></script>
     
-    <!-- Web3Modal / WalletConnect -->
-    <script type="module">
-        import { createAppKit, useAppKitProvider, useAppKitAccount } from 'https://cdn.jsdelivr.net/npm/@reown/appkit@1.6.8/+esm';
-        import { EthersAdapter } from 'https://cdn.jsdelivr.net/npm/@reown/appkit-adapter-ethers@1.6.8/+esm';
-        import { base } from 'https://cdn.jsdelivr.net/npm/@reown/appkit@1.6.8/networks/+esm';
-
-        // WalletConnect Project ID
-        const projectId = '286e939deb1fd152d44312f068de95da';
-
+    <!-- WalletConnect -->
+    <script src="https://unpkg.com/@walletconnect/modal@2.6.2/dist/index.umd.js"></script>
+    <script src="https://unpkg.com/@walletconnect/ethereum-provider@2.11.0/dist/index.umd.js"></script>
+    
+    <script>
         // Contract addresses
         const STAKING_ADDRESS = '0x4b5b62Bde4Be0fBab30A74d79c7Cb25FD242c3Cc';
         const TOKEN_ADDRESS = '0x2ca8b2b97bc0f0ccdd875dcfeff16b868a1b5ba3';
+        const BASE_CHAIN_ID = 8453;
+        const WALLETCONNECT_PROJECT_ID = '286e939deb1fd152d44312f068de95da';
 
-        // ABIs (minimal)
+        // ABIs
         const STAKING_ABI = [
             'function stake(uint256 amount) external',
             'function unstake(uint256 amount) external',
@@ -758,57 +918,215 @@
             'function symbol() view returns (string)'
         ];
 
-        // Metadata
-        const metadata = {
-            name: 'BAI Diamond Hands Staking',
-            description: 'Paper Hands Pay, Diamond Hands Gain - Stake BAItest tokens',
-            url: 'https://simpleonbase-commits.github.io/BAI-V.0.0.01/',
-            icons: ['https://simpleonbase-commits.github.io/BAI-V.0.0.01/favicon.ico']
-        };
-
-        // Create AppKit
-        const appKit = createAppKit({
-            adapters: [new EthersAdapter()],
-            networks: [base],
-            projectId,
-            metadata,
-            features: {
-                analytics: false
-            },
-            themeMode: 'dark',
-            themeVariables: {
-                '--w3m-accent': '#ffa500',
-                '--w3m-color-mix': '#ff6b6b',
-                '--w3m-color-mix-strength': 20
-            }
-        });
-
         // Global state
-        let provider, signer, userAddress;
-        let stakingContract, tokenContract;
+        let provider = null;
+        let signer = null;
+        let userAddress = null;
+        let stakingContract = null;
+        let tokenContract = null;
         let tokenDecimals = 18;
         let userStakeAmount = 0n;
         let userUnlocked = true;
         let userUnlockTime = 0;
+        let walletConnectProvider = null;
 
-        // Make appKit available globally
-        window.appKit = appKit;
+        // Check wallet availability on load
+        window.addEventListener('load', () => {
+            checkWalletAvailability();
+        });
 
-        // Open connect modal
-        window.openConnectModal = async function() {
-            await appKit.open();
-        };
+        function checkWalletAvailability() {
+            // MetaMask
+            if (typeof window.ethereum !== 'undefined' && window.ethereum.isMetaMask) {
+                document.getElementById('metamaskStatus').textContent = 'Installed';
+                document.getElementById('metamaskOption').classList.remove('disabled');
+            } else {
+                document.getElementById('metamaskStatus').textContent = 'Not Installed';
+                document.getElementById('metamaskStatus').classList.add('not-installed');
+            }
+
+            // Coinbase
+            if (typeof window.ethereum !== 'undefined' && (window.ethereum.isCoinbaseWallet || window.ethereum.providers?.some(p => p.isCoinbaseWallet))) {
+                document.getElementById('coinbaseStatus').textContent = 'Installed';
+                document.getElementById('coinbaseOption').classList.remove('disabled');
+            } else {
+                document.getElementById('coinbaseStatus').textContent = 'Not Installed';
+                document.getElementById('coinbaseStatus').classList.add('not-installed');
+            }
+        }
+
+        // Modal functions
+        function openWalletModal() {
+            document.getElementById('walletModal').classList.add('active');
+        }
+
+        function closeWalletModal(event) {
+            if (!event || event.target === document.getElementById('walletModal')) {
+                document.getElementById('walletModal').classList.remove('active');
+            }
+        }
+
+        // Connect MetaMask
+        async function connectMetaMask() {
+            if (typeof window.ethereum === 'undefined') {
+                window.open('https://metamask.io/download/', '_blank');
+                return;
+            }
+
+            try {
+                // Find MetaMask provider
+                let eth = window.ethereum;
+                if (window.ethereum.providers) {
+                    eth = window.ethereum.providers.find(p => p.isMetaMask) || window.ethereum;
+                }
+
+                const accounts = await eth.request({ method: 'eth_requestAccounts' });
+                provider = new ethers.BrowserProvider(eth);
+                signer = await provider.getSigner();
+                userAddress = accounts[0];
+
+                await onConnected();
+                closeWalletModal();
+
+                // Listen for account changes
+                eth.on('accountsChanged', handleAccountsChanged);
+                eth.on('chainChanged', () => window.location.reload());
+
+            } catch (error) {
+                console.error('MetaMask connection error:', error);
+                alert('Failed to connect: ' + (error.message || error));
+            }
+        }
+
+        // Connect Coinbase Wallet
+        async function connectCoinbase() {
+            if (typeof window.ethereum === 'undefined') {
+                window.open('https://www.coinbase.com/wallet', '_blank');
+                return;
+            }
+
+            try {
+                let eth = window.ethereum;
+                if (window.ethereum.providers) {
+                    eth = window.ethereum.providers.find(p => p.isCoinbaseWallet) || window.ethereum;
+                }
+
+                const accounts = await eth.request({ method: 'eth_requestAccounts' });
+                provider = new ethers.BrowserProvider(eth);
+                signer = await provider.getSigner();
+                userAddress = accounts[0];
+
+                await onConnected();
+                closeWalletModal();
+
+                eth.on('accountsChanged', handleAccountsChanged);
+                eth.on('chainChanged', () => window.location.reload());
+
+            } catch (error) {
+                console.error('Coinbase connection error:', error);
+                alert('Failed to connect: ' + (error.message || error));
+            }
+        }
+
+        // Connect WalletConnect
+        async function connectWalletConnect() {
+            try {
+                const WalletConnectProvider = window.EthereumProvider.EthereumProvider;
+                
+                walletConnectProvider = await WalletConnectProvider.init({
+                    projectId: WALLETCONNECT_PROJECT_ID,
+                    chains: [BASE_CHAIN_ID],
+                    showQrModal: true,
+                    metadata: {
+                        name: 'BAI Diamond Hands Staking',
+                        description: 'Paper Hands Pay, Diamond Hands Gain',
+                        url: 'https://simpleonbase-commits.github.io/BAI-V.0.0.01/',
+                        icons: ['https://simpleonbase-commits.github.io/BAI-V.0.0.01/favicon.ico']
+                    }
+                });
+
+                await walletConnectProvider.connect();
+                
+                provider = new ethers.BrowserProvider(walletConnectProvider);
+                signer = await provider.getSigner();
+                userAddress = await signer.getAddress();
+
+                await onConnected();
+                closeWalletModal();
+
+                walletConnectProvider.on('accountsChanged', handleAccountsChanged);
+                walletConnectProvider.on('chainChanged', () => window.location.reload());
+                walletConnectProvider.on('disconnect', disconnectWallet);
+
+            } catch (error) {
+                console.error('WalletConnect error:', error);
+                if (error.message !== 'User rejected the request.') {
+                    alert('Failed to connect: ' + (error.message || error));
+                }
+            }
+        }
+
+        // Handle account changes
+        function handleAccountsChanged(accounts) {
+            if (accounts.length === 0) {
+                disconnectWallet();
+            } else {
+                userAddress = accounts[0];
+                document.getElementById('walletAddress').textContent = 
+                    userAddress.slice(0, 6) + '...' + userAddress.slice(-4);
+                refreshData();
+            }
+        }
+
+        // On connected
+        async function onConnected() {
+            // Update UI
+            document.getElementById('connectBtn').style.display = 'none';
+            document.getElementById('walletInfo').style.display = 'inline-flex';
+            document.getElementById('walletAddress').textContent = 
+                userAddress.slice(0, 6) + '...' + userAddress.slice(-4);
+
+            // Enable buttons
+            document.getElementById('stakeBtn').disabled = false;
+            document.getElementById('stakeBtn').textContent = '💎 Stake BAItest';
+            document.getElementById('unstakeBtn').disabled = false;
+            document.getElementById('unstakeBtn').textContent = '📤 Unstake';
+            document.getElementById('claimBtn').disabled = false;
+            document.getElementById('claimBtn').textContent = '🎁 Claim Rewards';
+            document.getElementById('exitBtn').disabled = false;
+
+            // Check network
+            const network = await provider.getNetwork();
+            if (Number(network.chainId) !== BASE_CHAIN_ID) {
+                document.getElementById('networkWarning').style.display = 'block';
+            } else {
+                document.getElementById('networkWarning').style.display = 'none';
+            }
+
+            // Setup contracts
+            stakingContract = new ethers.Contract(STAKING_ADDRESS, STAKING_ABI, signer);
+            tokenContract = new ethers.Contract(TOKEN_ADDRESS, ERC20_ABI, signer);
+
+            // Refresh data
+            await refreshData();
+        }
 
         // Disconnect
-        window.disconnectWallet = async function() {
-            await appKit.disconnect();
-            resetUI();
-        };
+        function disconnectWallet() {
+            if (walletConnectProvider) {
+                walletConnectProvider.disconnect();
+                walletConnectProvider = null;
+            }
+            
+            provider = null;
+            signer = null;
+            userAddress = null;
+            stakingContract = null;
+            tokenContract = null;
 
-        // Reset UI
-        function resetUI() {
             document.getElementById('connectBtn').style.display = 'block';
             document.getElementById('walletInfo').style.display = 'none';
+            document.getElementById('networkWarning').style.display = 'none';
             document.getElementById('stakeBtn').disabled = true;
             document.getElementById('stakeBtn').textContent = 'Connect Wallet to Stake';
             document.getElementById('unstakeBtn').disabled = true;
@@ -816,87 +1134,61 @@
             document.getElementById('claimBtn').disabled = true;
             document.getElementById('claimBtn').textContent = 'Connect Wallet to Claim';
             document.getElementById('exitBtn').disabled = true;
-            provider = null;
-            signer = null;
-            userAddress = null;
         }
 
-        // Subscribe to account changes
-        appKit.subscribeAccount(async (account) => {
-            console.log('Account changed:', account);
-            if (account.isConnected && account.address) {
-                userAddress = account.address;
-                document.getElementById('connectBtn').style.display = 'none';
-                document.getElementById('walletInfo').style.display = 'inline-flex';
-                document.getElementById('walletAddress').textContent = 
-                    userAddress.slice(0, 6) + '...' + userAddress.slice(-4);
-
-                // Enable buttons
-                document.getElementById('stakeBtn').disabled = false;
-                document.getElementById('stakeBtn').textContent = '💎 Stake BAItest';
-                document.getElementById('unstakeBtn').disabled = false;
-                document.getElementById('unstakeBtn').textContent = '📤 Unstake';
-                document.getElementById('claimBtn').disabled = false;
-                document.getElementById('claimBtn').textContent = '🎁 Claim Rewards';
-                document.getElementById('exitBtn').disabled = false;
-
-                // Setup provider and contracts
-                try {
-                    const walletProvider = appKit.getWalletProvider();
-                    if (walletProvider) {
-                        provider = new ethers.BrowserProvider(walletProvider);
-                        signer = await provider.getSigner();
-                        stakingContract = new ethers.Contract(STAKING_ADDRESS, STAKING_ABI, signer);
-                        tokenContract = new ethers.Contract(TOKEN_ADDRESS, ERC20_ABI, signer);
-                        await refreshData();
-                    }
-                } catch (err) {
-                    console.error('Setup error:', err);
+        // Switch to Base network
+        async function switchToBase() {
+            try {
+                await window.ethereum.request({
+                    method: 'wallet_switchEthereumChain',
+                    params: [{ chainId: '0x2105' }]
+                });
+            } catch (switchError) {
+                if (switchError.code === 4902) {
+                    await window.ethereum.request({
+                        method: 'wallet_addEthereumChain',
+                        params: [{
+                            chainId: '0x2105',
+                            chainName: 'Base',
+                            nativeCurrency: { name: 'ETH', symbol: 'ETH', decimals: 18 },
+                            rpcUrls: ['https://mainnet.base.org'],
+                            blockExplorerUrls: ['https://basescan.org']
+                        }]
+                    });
                 }
-            } else {
-                resetUI();
             }
-        });
+        }
 
         // Tab switching
-        window.showTab = function(tabName) {
+        function showTab(tabName, btn) {
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             document.getElementById(tabName + 'Tab').classList.add('active');
-            event.target.classList.add('active');
-        };
+            btn.classList.add('active');
+        }
 
         // Refresh all data
         async function refreshData() {
             if (!stakingContract || !tokenContract || !userAddress) return;
             
             try {
-                // Get token decimals
                 tokenDecimals = Number(await tokenContract.decimals());
 
-                // Total staked
                 const total = await stakingContract.totalStaked();
-                document.getElementById('totalStaked').textContent = 
-                    formatAmount(total) + ' BAItest';
+                document.getElementById('totalStaked').textContent = formatAmount(total) + ' BAItest';
 
-                // User balance
                 const balance = await tokenContract.balanceOf(userAddress);
                 document.getElementById('walletBalance').textContent = formatAmount(balance);
 
-                // User stake
                 const stakeInfo = await stakingContract.stakes(userAddress);
                 userStakeAmount = stakeInfo[0];
-                document.getElementById('yourStake').textContent = 
-                    formatAmount(userStakeAmount) + ' BAItest';
+                document.getElementById('yourStake').textContent = formatAmount(userStakeAmount) + ' BAItest';
                 document.getElementById('stakedBalance').textContent = formatAmount(userStakeAmount);
 
-                // User rewards
                 const rewards = await stakingContract.earned(userAddress);
-                document.getElementById('yourRewards').textContent = 
-                    formatAmount(rewards) + ' BAItest';
+                document.getElementById('yourRewards').textContent = formatAmount(rewards) + ' BAItest';
                 document.getElementById('claimableRewards').textContent = formatAmount(rewards);
 
-                // Lock status
                 userUnlocked = await stakingContract.isUnlocked(userAddress);
                 userUnlockTime = Number(await stakingContract.unlockTime(userAddress));
                 
@@ -918,29 +1210,25 @@
                     updateCountdown();
                 }
 
-                // Check allowance
                 await checkAllowance();
 
             } catch (error) {
                 console.error('Error refreshing data:', error);
             }
         }
-        window.refreshData = refreshData;
 
-        // Check token allowance
         async function checkAllowance() {
             if (!tokenContract || !userAddress) return;
             const allowance = await tokenContract.allowance(userAddress, STAKING_ADDRESS);
             const balance = await tokenContract.balanceOf(userAddress);
             
-            if (allowance < balance) {
+            if (allowance < balance && balance > 0n) {
                 document.getElementById('approveBtn').style.display = 'block';
             } else {
                 document.getElementById('approveBtn').style.display = 'none';
             }
         }
 
-        // Format amount
         function formatAmount(amount) {
             const formatted = ethers.formatUnits(amount, tokenDecimals);
             const num = parseFloat(formatted);
@@ -948,9 +1236,7 @@
             if (num < 0.01) return '<0.01';
             return num.toLocaleString(undefined, { maximumFractionDigits: 2 });
         }
-        window.formatAmount = formatAmount;
 
-        // Update countdown
         function updateCountdown() {
             const now = Math.floor(Date.now() / 1000);
             const remaining = userUnlockTime - now;
@@ -972,8 +1258,7 @@
             document.getElementById('unlockCountdown').textContent = text;
         }
 
-        // Update penalty preview
-        window.updatePenaltyPreview = function() {
+        function updatePenaltyPreview() {
             const amount = document.getElementById('unstakeAmount').value;
             if (!amount || isNaN(amount) || parseFloat(amount) <= 0) {
                 document.getElementById('penaltyPreview').textContent = '-- BAItest';
@@ -993,23 +1278,20 @@
                 document.getElementById('receiveAmount').textContent = receive.toFixed(2) + ' BAItest';
                 document.getElementById('penaltyAmount').textContent = penalty.toFixed(2);
             }
-        };
+        }
 
-        // Set max stake
-        window.setMaxStake = async function() {
+        async function setMaxStake() {
             if (!tokenContract || !userAddress) return;
             const balance = await tokenContract.balanceOf(userAddress);
             document.getElementById('stakeAmount').value = ethers.formatUnits(balance, tokenDecimals);
-        };
+        }
 
-        // Set max unstake
-        window.setMaxUnstake = function() {
+        function setMaxUnstake() {
             document.getElementById('unstakeAmount').value = ethers.formatUnits(userStakeAmount, tokenDecimals);
-            window.updatePenaltyPreview();
-        };
+            updatePenaltyPreview();
+        }
 
-        // Approve tokens
-        window.approveTokens = async function() {
+        async function approveTokens() {
             try {
                 const btn = document.getElementById('approveBtn');
                 btn.innerHTML = '<span class="spinner"></span>Approving...';
@@ -1029,10 +1311,9 @@
                 btn.innerHTML = 'Approve BAItest';
                 btn.disabled = false;
             }
-        };
+        }
 
-        // Stake tokens
-        window.stakeTokens = async function() {
+        async function stakeTokens() {
             try {
                 const amount = document.getElementById('stakeAmount').value;
                 if (!amount || parseFloat(amount) <= 0) {
@@ -1059,10 +1340,9 @@
                 document.getElementById('stakeBtn').innerHTML = '💎 Stake BAItest';
                 document.getElementById('stakeBtn').disabled = false;
             }
-        };
+        }
 
-        // Unstake tokens
-        window.unstakeTokens = async function() {
+        async function unstakeTokens() {
             try {
                 const amount = document.getElementById('unstakeAmount').value;
                 if (!amount || parseFloat(amount) <= 0) {
@@ -1096,10 +1376,9 @@
                 document.getElementById('unstakeBtn').innerHTML = '📤 Unstake';
                 document.getElementById('unstakeBtn').disabled = false;
             }
-        };
+        }
 
-        // Claim rewards
-        window.claimRewards = async function() {
+        async function claimRewards() {
             try {
                 const btn = document.getElementById('claimBtn');
                 btn.innerHTML = '<span class="spinner"></span>Claiming...';
@@ -1118,10 +1397,9 @@
                 document.getElementById('claimBtn').innerHTML = '🎁 Claim Rewards';
                 document.getElementById('claimBtn').disabled = false;
             }
-        };
+        }
 
-        // Exit all
-        window.exitAll = async function() {
+        async function exitAll() {
             try {
                 if (!userUnlocked && userStakeAmount > 0n) {
                     const penaltyAmount = userStakeAmount * 20n / 100n;
@@ -1148,9 +1426,8 @@
                 document.getElementById('exitBtn').innerHTML = '🚪 Exit All (Unstake + Claim)';
                 document.getElementById('exitBtn').disabled = false;
             }
-        };
+        }
 
-        // Update countdown every minute
         setInterval(updateCountdown, 60000);
     </script>
 </body>
