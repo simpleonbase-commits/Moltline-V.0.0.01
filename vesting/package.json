@@ -1,15 +1,17 @@
 {
   "name": "bai-vesting",
   "version": "1.0.0",
-  "description": "BAI Token Vesting Contract - 2 Year Lock",
+  "description": "BAI Token 2-Year Vesting Contract",
   "scripts": {
-    "compile": "npx hardhat compile",
-    "test": "npx hardhat test",
-    "deploy": "npx hardhat run scripts/deploy.js --network base"
+    "compile": "hardhat compile",
+    "test": "hardhat test",
+    "deploy": "hardhat run scripts/deploy.js --network base"
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^4.0.0",
-    "hardhat": "^2.22.0",
+    "hardhat": "^2.19.0"
+  },
+  "dependencies": {
     "@openzeppelin/contracts": "^5.0.0"
   }
 }
