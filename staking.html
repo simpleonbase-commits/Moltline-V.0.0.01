@@ -37,6 +37,50 @@
                 radial-gradient(ellipse at bottom, rgba(139, 92, 246, 0.1) 0%, transparent 50%);
         }
 
+        /* Security Banner */
+        .security-banner {
+            background: linear-gradient(90deg, rgba(16, 185, 129, 0.15), rgba(59, 130, 246, 0.15));
+            border-bottom: 1px solid rgba(16, 185, 129, 0.3);
+            padding: 0.75rem 1rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+            font-size: 0.85rem;
+        }
+
+        .security-badge {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--accent-green);
+            font-weight: 500;
+        }
+
+        .security-badge.warning {
+            color: var(--accent-gold);
+        }
+
+        .domain-display {
+            background: rgba(16, 185, 129, 0.2);
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-family: monospace;
+            font-size: 0.8rem;
+            color: var(--accent-green);
+        }
+
+        .verify-link {
+            color: var(--accent-blue);
+            text-decoration: none;
+            font-size: 0.8rem;
+        }
+
+        .verify-link:hover {
+            text-decoration: underline;
+        }
+
         .container {
             max-width: 1200px;
             margin: 0 auto;
@@ -77,6 +121,19 @@
 
         .logo-text span {
             color: var(--accent-blue);
+        }
+
+        .official-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--accent-green);
+            font-size: 0.65rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            margin-left: 0.5rem;
+            font-weight: 600;
         }
 
         .connect-btn {
@@ -126,6 +183,46 @@
         .hero .subtitle {
             color: var(--text-secondary);
             font-size: 1.1rem;
+        }
+
+        /* Contract Verification Box */
+        .verification-box {
+            background: var(--bg-card);
+            border: 1px solid var(--accent-green);
+            border-radius: 12px;
+            padding: 1rem 1.5rem;
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+        }
+
+        .verification-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .verification-item .icon {
+            font-size: 1.25rem;
+        }
+
+        .verification-item .label {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+        }
+
+        .verification-item a {
+            color: var(--accent-green);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .verification-item a:hover {
+            text-decoration: underline;
         }
 
         /* Stats Grid */
@@ -179,6 +276,9 @@
             }
             .hero h1 {
                 font-size: 2rem;
+            }
+            .security-banner {
+                font-size: 0.75rem;
             }
         }
 
@@ -452,6 +552,39 @@
             word-break: break-all;
         }
 
+        /* Security Tips Box */
+        .security-tips {
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            border-radius: 12px;
+            padding: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .security-tips-title {
+            color: var(--accent-gold);
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .security-tips ul {
+            margin: 0;
+            padding-left: 1.25rem;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+        }
+
+        .security-tips li {
+            margin-bottom: 0.5rem;
+        }
+
+        .security-tips li:last-child {
+            margin-bottom: 0;
+        }
+
         /* Footer */
         .footer {
             text-align: center;
@@ -468,6 +601,18 @@
 
         .footer a:hover {
             text-decoration: underline;
+        }
+
+        .footer-security {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: var(--bg-card);
+            border-radius: 12px;
+            font-size: 0.8rem;
+        }
+
+        .footer-security a {
+            color: var(--accent-green);
         }
 
         /* Wallet Modal Styles */
@@ -524,6 +669,17 @@
 
         .wallet-modal-close:hover {
             color: var(--text-primary);
+        }
+
+        .wallet-security-notice {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: 10px;
+            padding: 0.75rem 1rem;
+            margin-bottom: 1.5rem;
+            font-size: 0.8rem;
+            color: var(--accent-green);
+            text-align: center;
         }
 
         .wallet-option {
@@ -696,15 +852,128 @@
                 display: none;
             }
         }
+
+        /* Transaction Preview Modal */
+        .tx-preview-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 1001;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .tx-preview-modal.show {
+            display: flex;
+        }
+
+        .tx-preview-content {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 2rem;
+            max-width: 450px;
+            width: 100%;
+        }
+
+        .tx-preview-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .tx-preview-warning {
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            font-size: 0.85rem;
+            color: var(--accent-gold);
+        }
+
+        .tx-preview-details {
+            background: var(--bg-dark);
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .tx-detail-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
+            font-size: 0.9rem;
+        }
+
+        .tx-detail-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .tx-detail-label {
+            color: var(--text-secondary);
+        }
+
+        .tx-detail-value {
+            font-weight: 600;
+            font-family: monospace;
+            word-break: break-all;
+            text-align: right;
+            max-width: 60%;
+        }
+
+        .tx-preview-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .tx-preview-buttons button {
+            flex: 1;
+            padding: 1rem;
+            border: none;
+            border-radius: 10px;
+            font-family: inherit;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .tx-cancel-btn {
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color) !important;
+        }
+
+        .tx-confirm-btn {
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+            color: white;
+        }
     </style>
 </head>
 <body>
+    <!-- Security Banner -->
+    <div class="security-banner">
+        <div class="security-badge">
+            <span>🔒</span>
+            <span>Official BAI Site</span>
+        </div>
+        <div class="domain-display" id="currentDomain">Loading...</div>
+        <a href="https://basescan.org/address/0x4b5b62Bde4Be0fBab30A74d79c7Cb25FD242c3Cc#code" target="_blank" class="verify-link">Verify Contract →</a>
+    </div>
+
     <div class="container">
         <!-- Header -->
         <header class="header">
             <div class="logo">
                 <div class="logo-icon">💎</div>
                 <div class="logo-text">BAI <span>Staking</span></div>
+                <span class="official-badge">✓ OFFICIAL</span>
             </div>
             <button class="connect-btn" id="connectBtn" onclick="openWalletModal()">Connect Wallet</button>
         </header>
@@ -715,6 +984,25 @@
             <p class="tagline">Stake BAItest • Earn from early exits</p>
             <p class="subtitle">Lock for 7 days or pay 20% to those who wait</p>
         </section>
+
+        <!-- Contract Verification Box -->
+        <div class="verification-box">
+            <div class="verification-item">
+                <span class="icon">✅</span>
+                <span class="label">Contract Verified:</span>
+                <a href="https://basescan.org/address/0x4b5b62Bde4Be0fBab30A74d79c7Cb25FD242c3Cc#code" target="_blank">BaseScan</a>
+            </div>
+            <div class="verification-item">
+                <span class="icon">✅</span>
+                <span class="label">Source Verified:</span>
+                <a href="https://repo.sourcify.dev/contracts/full_match/8453/0x4b5b62Bde4Be0fBab30A74d79c7Cb25FD242c3Cc/" target="_blank">Sourcify</a>
+            </div>
+            <div class="verification-item">
+                <span class="icon">📂</span>
+                <span class="label">Open Source:</span>
+                <a href="https://github.com/simpleonbase-commits/BAI-V.0.0.01" target="_blank">GitHub</a>
+            </div>
+        </div>
 
         <!-- Stats -->
         <section class="stats-grid">
@@ -856,8 +1144,19 @@
                 <button class="action-btn primary" onclick="exitAll()" id="exitBtn">Exit All (Unstake + Claim)</button>
 
                 <div class="token-info">
-                    <div class="token-info-label">Staking Contract</div>
+                    <div class="token-info-label">Staking Contract (Verified ✓)</div>
                     <div class="token-address">0x4b5b62Bde4Be0fBab30A74d79c7Cb25FD242c3Cc</div>
+                </div>
+
+                <!-- Security Tips -->
+                <div class="security-tips">
+                    <div class="security-tips-title">🛡️ Stay Safe</div>
+                    <ul>
+                        <li>Always verify you're on <strong>simpleonbase-commits.github.io</strong></li>
+                        <li>Never share your seed phrase with anyone</li>
+                        <li>Double-check contract addresses before signing</li>
+                        <li>This contract is unaudited — DYOR</li>
+                    </ul>
                 </div>
             </div>
         </section>
@@ -866,6 +1165,11 @@
         <footer class="footer">
             <p>Part of the <a href="index.html">Bureau of Agent Investigations</a></p>
             <p style="margin-top: 0.5rem">Contract verified on <a href="https://basescan.org/address/0x4b5b62Bde4Be0fBab30A74d79c7Cb25FD242c3Cc#code" target="_blank">BaseScan</a> & <a href="https://repo.sourcify.dev/contracts/full_match/8453/0x4b5b62Bde4Be0fBab30A74d79c7Cb25FD242c3Cc/" target="_blank">Sourcify</a></p>
+            
+            <div class="footer-security">
+                <p><strong>🔒 Security:</strong> Always verify you're on the official domain. Bookmark this page.</p>
+                <p style="margin-top: 0.5rem">Official Domain: <a href="https://simpleonbase-commits.github.io/BAI-V.0.0.01/staking.html">simpleonbase-commits.github.io</a></p>
+            </div>
         </footer>
     </div>
 
@@ -875,6 +1179,12 @@
             <div class="wallet-modal-header">
                 <span class="wallet-modal-title">Connect Wallet</span>
                 <button class="wallet-modal-close" onclick="closeWalletModal()">&times;</button>
+            </div>
+
+            <!-- Security Notice in Modal -->
+            <div class="wallet-security-notice">
+                🔒 You're connecting to the official BAI Staking site<br>
+                <small>Domain: <span id="modalDomain">simpleonbase-commits.github.io</span></small>
             </div>
             
             <!-- Desktop wallet options -->
@@ -947,6 +1257,19 @@
         </div>
     </div>
 
+    <!-- Transaction Preview Modal -->
+    <div class="tx-preview-modal" id="txPreviewModal">
+        <div class="tx-preview-content">
+            <div class="tx-preview-title" id="txPreviewTitle">Confirm Transaction</div>
+            <div class="tx-preview-warning" id="txPreviewWarning"></div>
+            <div class="tx-preview-details" id="txPreviewDetails"></div>
+            <div class="tx-preview-buttons">
+                <button class="tx-cancel-btn" onclick="closeTxPreview()">Cancel</button>
+                <button class="tx-confirm-btn" id="txConfirmBtn" onclick="confirmTx()">Confirm</button>
+            </div>
+        </div>
+    </div>
+
     <!-- QR Code Library -->
     <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
     
@@ -954,6 +1277,20 @@
     <script src="https://cdn.jsdelivr.net/npm/ethers@6.9.0/dist/ethers.umd.min.js"></script>
 
     <script>
+        // Set domain displays
+        document.getElementById('currentDomain').textContent = window.location.hostname;
+        document.getElementById('modalDomain').textContent = window.location.hostname;
+
+        // Verify we're on the correct domain
+        const OFFICIAL_DOMAINS = ['simpleonbase-commits.github.io', 'localhost', '127.0.0.1'];
+        if (!OFFICIAL_DOMAINS.includes(window.location.hostname)) {
+            document.querySelector('.security-banner').style.background = 'rgba(239, 68, 68, 0.2)';
+            document.querySelector('.security-banner').style.borderColor = 'rgba(239, 68, 68, 0.5)';
+            document.querySelector('.security-badge').innerHTML = '<span>⚠️</span><span style="color: #ef4444">UNVERIFIED DOMAIN</span>';
+            document.getElementById('currentDomain').style.background = 'rgba(239, 68, 68, 0.2)';
+            document.getElementById('currentDomain').style.color = '#ef4444';
+        }
+
         // Contract addresses
         const STAKING_CONTRACT = '0x4b5b62Bde4Be0fBab30A74d79c7Cb25FD242c3Cc';
         const TOKEN_CONTRACT = '0x2ca8b2b97bc0f0ccdd875dcfeff16b868a1b5ba3';
@@ -990,10 +1327,36 @@
         let tokenDecimals = 18;
         let wcUri = null;
         let signClient = null;
+        let pendingTxCallback = null;
 
         // Detect mobile
         function isMobile() {
             return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        }
+
+        // Transaction Preview Functions
+        function showTxPreview(title, warning, details, callback) {
+            document.getElementById('txPreviewTitle').textContent = title;
+            document.getElementById('txPreviewWarning').innerHTML = warning;
+            
+            let detailsHtml = '';
+            for (const [label, value] of Object.entries(details)) {
+                detailsHtml += `<div class="tx-detail-row"><span class="tx-detail-label">${label}</span><span class="tx-detail-value">${value}</span></div>`;
+            }
+            document.getElementById('txPreviewDetails').innerHTML = detailsHtml;
+            
+            pendingTxCallback = callback;
+            document.getElementById('txPreviewModal').classList.add('show');
+        }
+
+        function closeTxPreview() {
+            document.getElementById('txPreviewModal').classList.remove('show');
+            pendingTxCallback = null;
+        }
+
+        function confirmTx() {
+            closeTxPreview();
+            if (pendingTxCallback) pendingTxCallback();
         }
 
         // Wallet Modal Functions
@@ -1028,6 +1391,10 @@
         // Click outside to close
         document.getElementById('walletModal').addEventListener('click', function(e) {
             if (e.target === this) closeWalletModal();
+        });
+
+        document.getElementById('txPreviewModal').addEventListener('click', function(e) {
+            if (e.target === this) closeTxPreview();
         });
 
         // Generate WalletConnect link
@@ -1390,7 +1757,22 @@
                 alert('Please enter an amount to stake');
                 return;
             }
-            
+
+            // Show transaction preview
+            showTxPreview(
+                '🔒 Confirm Stake',
+                '⚠️ <strong>Important:</strong> Your tokens will be locked for 7 days. Early withdrawal incurs a 20% penalty.',
+                {
+                    'Amount': amount + ' BAItest',
+                    'Lock Period': '7 days',
+                    'Contract': STAKING_CONTRACT.slice(0, 10) + '...' + STAKING_CONTRACT.slice(-8)
+                },
+                executeStake
+            );
+        }
+
+        async function executeStake() {
+            const amount = document.getElementById('stakeAmount').value;
             const btn = document.getElementById('stakeBtn');
             const originalText = btn.textContent;
             
@@ -1436,11 +1818,27 @@
             }
             
             const isUnlocked = document.getElementById('lockStatus').textContent.includes('Unlocked');
-            if (!isUnlocked) {
-                const confirm = window.confirm('⚠️ Your stake is still locked!\n\nUnstaking now will cost you 20% penalty.\n\nAre you sure?');
-                if (!confirm) return;
-            }
-            
+            const penalty = isUnlocked ? 0 : parseFloat(amount) * 0.20;
+            const receive = parseFloat(amount) - penalty;
+
+            // Show transaction preview
+            showTxPreview(
+                isUnlocked ? '🔓 Confirm Unstake' : '⚠️ Early Unstake Warning',
+                isUnlocked 
+                    ? '✅ Your lock period has ended. You can unstake without penalty.'
+                    : '🚨 <strong>PENALTY WARNING:</strong> Your stake is still locked! You will lose <strong>20%</strong> of your tokens as a penalty. This penalty goes to other stakers.',
+                {
+                    'Unstake Amount': amount + ' BAItest',
+                    'Penalty': penalty.toFixed(4) + ' BAItest',
+                    'You Receive': receive.toFixed(4) + ' BAItest',
+                    'Contract': STAKING_CONTRACT.slice(0, 10) + '...' + STAKING_CONTRACT.slice(-8)
+                },
+                executeUnstake
+            );
+        }
+
+        async function executeUnstake() {
+            const amount = document.getElementById('unstakeAmount').value;
             const btn = document.getElementById('unstakeBtn');
             const originalText = btn.textContent;
             
@@ -1468,7 +1866,22 @@
                 openWalletModal();
                 return;
             }
+
+            const rewards = document.getElementById('claimableRewards').textContent;
             
+            showTxPreview(
+                '💰 Claim Rewards',
+                '✅ Claim your earned rewards from paper hands penalties.',
+                {
+                    'Rewards': rewards,
+                    'Source': 'Early exit penalties',
+                    'Contract': STAKING_CONTRACT.slice(0, 10) + '...' + STAKING_CONTRACT.slice(-8)
+                },
+                executeClaimRewards
+            );
+        }
+
+        async function executeClaimRewards() {
             const btn = document.getElementById('claimBtn');
             const originalText = btn.textContent;
             
@@ -1496,11 +1909,28 @@
             }
             
             const isUnlocked = document.getElementById('lockStatus').textContent.includes('Unlocked');
-            if (!isUnlocked) {
-                const confirm = window.confirm('⚠️ Your stake is still locked!\n\nExiting now will cost you 20% penalty on your staked amount.\n\nAre you sure?');
-                if (!confirm) return;
-            }
-            
+            const stakedAmount = document.getElementById('stakedBalance').textContent;
+            const rewards = document.getElementById('claimableRewards').textContent;
+            const penalty = isUnlocked ? 0 : parseFloat(stakedAmount) * 0.20;
+            const receive = parseFloat(stakedAmount) - penalty;
+
+            showTxPreview(
+                isUnlocked ? '🚀 Exit All' : '⚠️ Exit All (With Penalty)',
+                isUnlocked 
+                    ? '✅ Unstake all tokens and claim rewards in one transaction.'
+                    : '🚨 <strong>PENALTY WARNING:</strong> Your stake is locked! Exiting now costs 20% penalty.',
+                {
+                    'Staked': stakedAmount + ' BAItest',
+                    'Penalty': penalty.toFixed(4) + ' BAItest',
+                    'Tokens Received': receive.toFixed(4) + ' BAItest',
+                    'Rewards': rewards,
+                    'Contract': STAKING_CONTRACT.slice(0, 10) + '...' + STAKING_CONTRACT.slice(-8)
+                },
+                executeExitAll
+            );
+        }
+
+        async function executeExitAll() {
             const btn = document.getElementById('exitBtn');
             const originalText = btn.textContent;
             
